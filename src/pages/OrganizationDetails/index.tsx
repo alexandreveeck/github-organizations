@@ -7,19 +7,18 @@ import IOrganizationDetails from "../../types/IOrganizationDetails";
 import { Container, Content } from "./styles";
 
 function OrganizationDetails(){
-  const { id } = useParams();
   const [organization, setOrganization] = useState<IOrganizationDetails>();
+  const { id } = useParams();
 
     useEffect(() => {
+      async function fetchData(){
+        if(id) {
+          var data = (await organizationService.getOrganizationById(id)).data;
+          setOrganization(data);
+        }
+      } 
       fetchData();
     }, []);
-
-    async function fetchData(){
-      if(id) {
-        var data = (await organizationService.getOrganizationById(id)).data;
-        setOrganization(data);
-      }
-    } 
 
     return (
         <Container>
@@ -30,7 +29,7 @@ function OrganizationDetails(){
           subTitle="About the organization"
         />
         <Content>
-          <img width="150" src={organization?.avatar_url}></img>
+          <img width="150" src={organization?.avatar_url} alt="avatar"></img>
           <Row gutter={[8, 8]}>
             <Col span={4}>
               <p>Description</p>

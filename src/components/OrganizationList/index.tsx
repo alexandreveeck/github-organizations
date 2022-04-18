@@ -20,6 +20,12 @@ function OrganizationList() {
     const [total, setTotal] = useState(0);
 
     useEffect(() => {
+        async function fetchData() {
+            const response = (await organizationService.getAll()).data;
+                const orderedList =  await orderByName(response);
+                setTotal(response.length);
+                setData(orderedList);
+        }
         fetchData();
     }, []);
 
@@ -27,15 +33,8 @@ function OrganizationList() {
         handlePageChange(1, 10);
     }, [data]);
 
-    async function fetchData() {
-        const response = (await organizationService.getAll()).data;
-            const orderedList =  await orderByName(response);
-            setTotal(response.length);
-            setData(orderedList);
-    }
-
     async function handlePageChange(page: number, pageSize: number) {
-            const start = page == 1 ? 0 : (pageSize * page - pageSize);
+            const start = page === 1 ? 0 : (pageSize * page - pageSize);
             const limit = (pageSize * page);
             const pageRegisters =  data.slice(start, limit);
             setOrganizations(pageRegisters);
