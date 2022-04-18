@@ -3,74 +3,70 @@ import { useEffect, useState } from "react";
 import organizationService from "../../services/organizationService";
 import IOrganization from "../../types/IOrganization";
 import 'antd/dist/antd.css';
-import { List, Avatar } from 'antd';
-import InfiniteScroll from 'react-infinite-scroller';
+import { List, Avatar, Pagination } from 'antd';
 import { Link } from 'react-router-dom';
 
 /* 
-        Normally I would make a parameter on the API endpoint to skip the registers that I have already consumed and would deliver
+    Normally I would make a parameter on the API endpoint to skip the registers that I have already consumed and would deliver
     to ordered by name to the frontend. However this API has three parameters: per_page, since and accept. The since parameter obtains 
     registers greater than a specific ID. But considering that I  need to order the registers on the frontend I can't use that. 
-    For this specific reason I decided to take all data from the request and fetch only 10 on each time. I implemented an infinite 
-    scroll using the lib react-inifnite-scroller. But I'm aware that the best solution would be having a parameter skip, take, 
-    and order by on the API and consume only the necessary. 
+    For this specific reason I decided to take all data from the request and paginate it. But in my opinion the best solution would 
+    be having a parameter skip and take, on the api, taking only the necessary. The order of the registers should be on the API as well. 
 */
 
 function OrganizationList() {
     const [organizations, setOrganizations] = useState<IOrganization[]>([])
-    const [pageRegisters, setPageRegisters] = useState(10);
-    const [totalRegisters, setTotalRegisters] = useState(0);
+    const [data, setData] = useState<IOrganization[]>([])
+    const [total, setTotal] = useState(0);
 
     useEffect(() => {
         fetchData();
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        handlePageChange(1, 10);
+    }, [data]);
 
     async function fetchData() {
-        const data = await (await organizationService.getAll()).data;
-        setTotalRegisters(data.length);
-
-        setOrganizations(
-            orderByName(data)
-                .slice(0, pageRegisters) as IOrganization[]
-        );
+        const response = (await organizationService.getAll()).data;
+            setTotal(response.length);
+            const orderedList =  await orderByName(response);
+            setData(orderedList);
     }
 
-    function loadFunc() {
-        setPageRegisters(pageRegisters + 10);
-        fetchData();
+    async function handlePageChange(page: number, pageSize: number) {
+            let start = page == 1 ? 0 : (10 * page - 10);
+            const limit = (10 * page) -1;
+            const pageRegisters =  data.slice(start, limit);
+            setOrganizations(pageRegisters);
     }
 
     function orderByName(data: IOrganization[]) {
         return data.sort((a, b) => a.login.localeCompare(b.login))
     }
-
+    
+    if(organizations.length <= 0 )
+        return (<span>Loading...</span>)
+    else
     return (
-        <Container>
-            <h3>Organizations List</h3>
-            <InfiniteScroll
-                pageStart={0}
-                loadMore={loadFunc}
-                hasMore={pageRegisters < totalRegisters}
-                threshold={100}
-                loader={<div className="loader" key={0}>Loading ...</div>}
-            >
-                {
+            <div style={{ display: 'block', width: 700, padding: 30 }}>
+                <Container>
                     <List
-                        itemLayout="horizontal"
-                        dataSource={organizations}
-                        renderItem={item => (
-                            <List.Item>
-                                <List.Item.Meta
-                                    avatar={<Avatar src={item.avatar_url} />}
-                                    title={<Link to={`/organizationDetails/${item.id}`}>{item.login}</Link>}
-                                    description={item.description}
-                                />
-                            </List.Item>
-                        )} />
-                }
-            </InfiniteScroll>
-        </Container>
-    );
-}
+                                itemLayout="horizontal"
+                                dataSource={organizations}
+                                renderItem={item => (
+                                    <List.Item>
+                                        <List.Item.Meta
+                                            avatar={<Avatar src={item.avatar_url} />}
+                                            title={<Link to={`/organizationDetails/${item.id}`}>{item.login}</Link>}
+                                            description={item.description}
+                                        />
+                                    </List.Item>
+                                )} />
+                    </Container>
+                    <Pagination defaultCurrent={1} total={total} 
+                    onChange={handlePageChange} />
+            </div>
+            )}
 
 export default OrganizationList;
