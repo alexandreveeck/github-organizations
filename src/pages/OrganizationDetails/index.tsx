@@ -30,9 +30,10 @@ function OrganizationDetails(){
           subTitle="About the organization"
         />
         <Content>
+          <img width="150" src={organization?.avatar_url}></img>
           <Row gutter={[8, 8]}>
             <Col span={4}>
-              <img width="150" src={organization?.avatar_url}></img>
+              <p>Description</p>
             </Col>
             <Col span={4}>
               <p>{organization?.description}</p>
