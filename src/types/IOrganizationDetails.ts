@@ -1,6 +1,5 @@
 interface IOrganizationDetails {
     id: number;
-    login: string;
     name: string;
     description: string;
     avatar_url: string;

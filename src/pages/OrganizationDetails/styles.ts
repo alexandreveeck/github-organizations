@@ -1,12 +1,12 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-    padding: 0 0 0 3rem;
+    padding: 0 0 3rem 3rem;
+    overflow-x: hidden;
 `
 
 export const Content = styled.div`
     padding: 0 0 0 3rem;
-    overflow: hidden;
 
     img {
         padding-bottom: 2rem;
