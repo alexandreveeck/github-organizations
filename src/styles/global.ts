@@ -1,15 +1,6 @@
 import { createGlobalStyle } from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
-    :root {
-        --white: #FFFFFF;
-        --main: #406E8E;
-        --blue-light: #4d84eb;
-
-        --text-title: #0969da;
-        --text-body: #57606a;
-    }
-    
     * {
         margin: 0;
         padding: 0;
@@ -28,7 +19,6 @@ export const GlobalStyle = createGlobalStyle`
 
     body {
         background: #e3e3e3;
-
         -webkit-font-smoothing: antialiased;
     }
 
