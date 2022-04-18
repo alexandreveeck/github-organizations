@@ -1,4 +1,4 @@
-import { Container } from "./styles";
+import { Container, PaginationContainer } from "./styles";
 import { useEffect, useState } from "react";
 import organizationService from "../../services/organizationService";
 import IOrganization from "../../types/IOrganization";
@@ -29,27 +29,26 @@ function OrganizationList() {
 
     async function fetchData() {
         const response = (await organizationService.getAll()).data;
-            setTotal(response.length);
             const orderedList =  await orderByName(response);
+            setTotal(response.length);
             setData(orderedList);
     }
 
     async function handlePageChange(page: number, pageSize: number) {
-            let start = page == 1 ? 0 : (10 * page - 10);
-            const limit = (10 * page) -1;
+            const start = page == 1 ? 0 : (pageSize * page - pageSize);
+            const limit = (pageSize * page);
             const pageRegisters =  data.slice(start, limit);
             setOrganizations(pageRegisters);
     }
 
     function orderByName(data: IOrganization[]) {
-        return data.sort((a, b) => a.login.localeCompare(b.login))
+        return data.sort((a, b) => a.login.localeCompare(b.login));
     }
     
     if(organizations.length <= 0 )
         return (<span>Loading...</span>)
     else
     return (
-            <div style={{ display: 'block', width: 700, padding: 30 }}>
                 <Container>
                     <List
                                 itemLayout="horizontal"
@@ -63,10 +62,11 @@ function OrganizationList() {
                                         />
                                     </List.Item>
                                 )} />
+                    <PaginationContainer>
+                        <Pagination defaultCurrent={1} total={total} 
+                        onChange={handlePageChange} />         
+                    </PaginationContainer>
                     </Container>
-                    <Pagination defaultCurrent={1} total={total} 
-                    onChange={handlePageChange} />
-            </div>
             )}
 
 export default OrganizationList;
